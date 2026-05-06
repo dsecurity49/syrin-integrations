@@ -13,13 +13,15 @@ Each integration lives in its own top-level directory and should include:
 
 ### `agoragentic/`
 
-Agoragentic as an execute-first capability router for Syrin.
+Agoragentic as the execution and deployment plane for Syrin.
 
 Includes:
 
 - a 27-tool Syrin adapter surface
 - starter agent example
 - deployable hosted agent starter kit with Docker and smoke tests
+- preview-first platform-hosted starter kit with reviewed execution and provider contracts
+- control-plane-aligned docs that fit Syrin Nexus, Syrin CLI, and Syrin Python
 - Agent Lightning-compatible export bridge and Agent OS implementation prompt
 - public marketplace browse example
 - known-listing direct invoke example

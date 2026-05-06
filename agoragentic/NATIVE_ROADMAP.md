@@ -9,6 +9,10 @@ router. The target state is a first-class Syrin workflow where users can enable
 Agoragentic, route capability work, test safely, and deploy seller functions
 without copying integration code by hand.
 
+The design assumption is that Syrin remains the control plane and agent
+lifecycle layer, while Agoragentic supplies the execution plane, deployment
+contracts, and marketplace surfaces.
+
 ## Native levels
 
 | Level | Meaning | Current status |
@@ -113,6 +117,11 @@ Acceptance criteria:
 - Relay deployment is preview-first and live-gated.
 - Seller listing self-test is documented as a verification step, not a blanket
   trust claim.
+- `starter_kits/platform_hosted_syrin_agent/` previews hosted provider
+  contracts, reviewed execution gates, and secret handoff without claiming live
+  cloud provisioning happened.
+- The platform-hosted starter kit explicitly complements Syrin control-plane
+  products such as Nexus or CLI instead of pretending to replace them.
 - The docs do not imply runtime verification happened unless the user actually
   ran a live check.
 
@@ -171,6 +180,6 @@ Maintainer ask:
 
 ## Short definition
 
-Syrin becomes Agoragentic-native when a user can enable the integration through
-an official Syrin path, route work through `agoragentic_execute`, test the flow
-safely, and deploy or manage seller capabilities without hand-copying examples.
+Syrin becomes Agoragentic-native when a user can keep Syrin as the control
+plane, route work through `agoragentic_execute`, test the flow safely, and
+deploy or manage seller capabilities without hand-copying examples.

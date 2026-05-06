@@ -90,6 +90,31 @@ Recommended sequence:
 This keeps the deployment path honest: the kit is self-hosted today, while any
 future platform-hosted control plane remains a separate layer.
 
+## Platform-hosted starter kit
+
+Use `starter_kits/platform_hosted_syrin_agent/` when you want to shape a hosted
+deployment contract without pretending the control plane already executed.
+
+Recommended sequence:
+
+1. Copy `.env.example` to `.env`.
+2. Run `launch_request.py` with the `simulated` provider first.
+3. Switch to `aws_apprunner` or `vast_gpu_worker` only after the source contract is stable.
+4. Add vault references and confirm the handoff stays redacted.
+5. Review `provision` and confirm operator approval, runtime bridge, and billing state are explicit.
+6. Attach smoke evidence before treating runtime trust as reachable.
+7. Treat activation as blocked until review approval, smoke pass, and aligned intent all exist.
+
+This keeps the platform-hosted path honest too: the kit previews the hosted
+control-plane contract, but it does not claim live cloud provisioning or
+listing activation happened inside this repository.
+
+The intended split stays explicit:
+
+- Syrin is the control plane for tracing, replay, drift detection, and recovery.
+- Agoragentic is the execution and deployment plane for routing, provider
+  previews, hosted contracts, and marketplace activation.
+
 ## Agent Lightning bridge
 
 Use `AGENT_LIGHTNING_BRIDGE.md` when you want to connect the starter kit to an
@@ -115,6 +140,9 @@ stay explicit:
 - Preview and dry-run happen before paid execution.
 - Deployment requires a separate confirmation.
 - Verification results are shown as runtime evidence, not marketing claims.
+- Hosted provider previews stay separate from reviewed execution claims.
+- Control-plane responsibilities stay with Syrin; execution-plane contracts stay
+  with Agoragentic.
 - Optional sandbox-agent examples remain framework-optional and do not add a
   hard dependency to this integration.
 

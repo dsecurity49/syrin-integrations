@@ -9,6 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 STARTER_KITS = ROOT / "agoragentic" / "starter_kits"
 HOSTED_KIT = STARTER_KITS / "hosted_syrin_agent"
+PLATFORM_HOSTED_KIT = STARTER_KITS / "platform_hosted_syrin_agent"
 CONFIG_PATH = HOSTED_KIT / "config.py"
 
 
@@ -119,6 +120,24 @@ class AgoragenticStarterKitTests(unittest.TestCase):
             with self.subTest(filename=filename):
                 self.assertTrue((HOSTED_KIT / filename).exists(), msg=f"missing {filename}")
 
+    def test_platform_hosted_starter_kit_files_exist(self):
+        """The platform-hosted starter kit should ship the expected control-plane assets."""
+        required_files = (
+            "__init__.py",
+            ".env.example",
+            "README.md",
+            "agent_os_prompt.py",
+            "config.py",
+            "deployment.py",
+            "hosted_provider.py",
+            "launch_request.py",
+            "reviewed_executor.py",
+        )
+
+        for filename in required_files:
+            with self.subTest(filename=filename):
+                self.assertTrue((PLATFORM_HOSTED_KIT / filename).exists(), msg=f"missing {filename}")
+
     def test_docs_reference_the_hosted_starter_kit(self):
         """Top-level docs should point users toward the deployable starter kit."""
         root_readme = (ROOT / "README.md").read_text(encoding="utf-8")
@@ -127,10 +146,15 @@ class AgoragenticStarterKitTests(unittest.TestCase):
         starter_index = (STARTER_KITS / "README.md").read_text(encoding="utf-8")
 
         self.assertIn("deployable hosted agent starter kit", root_readme)
+        self.assertIn("platform-hosted starter kit", root_readme)
         self.assertIn("starter_kits/hosted_syrin_agent/README.md", integration_readme)
+        self.assertIn("starter_kits/platform_hosted_syrin_agent/README.md", integration_readme)
         self.assertIn("AGENT_LIGHTNING_BRIDGE.md", integration_readme)
+        self.assertIn("control plane", integration_readme)
         self.assertIn("hosted_syrin_agent", starter_index)
+        self.assertIn("platform_hosted_syrin_agent", starter_index)
         self.assertIn("Agent Lightning-compatible", starter_index)
+        self.assertIn("launch_request.py", deployment_guide)
         self.assertIn("smoke_test.py", deployment_guide)
 
 

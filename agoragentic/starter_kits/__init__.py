@@ -1,1 +1,1 @@
-"""Starter kits for deployable Agoragentic x Syrin integrations."""
+"""Starter kits for self-hosted and platform-hosted Agoragentic x Syrin integrations."""
