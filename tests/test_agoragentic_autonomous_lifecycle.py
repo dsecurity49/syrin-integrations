@@ -27,6 +27,7 @@ trap_execute = _load_example("trap_aware_execute")
 multimodal_eval = _load_example("multimodal_process_eval")
 harness_loop = _load_example("harness_engineering_loop")
 openai_sandbox = _load_example("openai_agents_sandbox_loop")
+syrin_swarm = _load_example("syrin_swarm_router_loop")
 
 
 class AutonomousLifecycleExampleTests(unittest.TestCase):
@@ -221,6 +222,77 @@ class AutonomousLifecycleExampleTests(unittest.TestCase):
         payload = openai_sandbox.build_execute_payload("Preview only.", max_cost=0.0)
 
         self.assertEqual(payload["constraints"]["max_cost"], 0.0)
+
+    def test_syrin_swarm_plan_enforces_per_agent_budget_cap(self):
+        """Syrin swarm plans should never allocate a role over per_agent_max."""
+        plan = syrin_swarm.build_swarm_router_plan(
+            "Run a bounded marketplace swarm.",
+            total_budget=10.0,
+            per_agent_max=0.10,
+        )
+
+        allocations = plan.budget.role_allocations
+        self.assertTrue(allocations)
+        self.assertTrue(all(value <= 0.10 for value in allocations.values()))
+        self.assertEqual(plan.execute_payload["constraints"]["per_agent_max"], 0.10)
+        self.assertIn("BudgetPool", plan.syrin_snippet)
+        self.assertIn("asyncio.run(main())", plan.syrin_snippet)
+
+    def test_syrin_swarm_budget_rounding_never_oversubscribes_pool(self):
+        """Rounded role allocations should not exceed the total budget."""
+        budget = syrin_swarm.build_budget_plan(
+            total_budget=0.0003,
+            per_agent_max=1.0,
+            roles=("orchestrator", "researcher"),
+        )
+
+        self.assertLessEqual(sum(budget.role_allocations.values()), budget.total_budget)
+
+    def test_syrin_swarm_plan_gates_live_spend_and_budget_intervention(self):
+        """Live spend and budget changes should require approval evidence."""
+        plan = syrin_swarm.build_swarm_router_plan(
+            "Execute a seller route.",
+            live_enabled=True,
+            requested_action="topup budget and execute live spend",
+        )
+
+        report = plan.approval_report
+        self.assertTrue(report["requires_approval"])
+        self.assertFalse(report["allowed"])
+        self.assertIn("execute live", report["sensitive_terms"])
+        self.assertIn("topup budget", report["sensitive_terms"])
+
+    def test_syrin_swarm_memory_policy_blocks_secret_like_content(self):
+        """MemoryBus sharing should reject secret-like or payment-sensitive content."""
+        self.assertFalse(
+            syrin_swarm.is_memory_share_allowed(
+                "Store this api_key for later.",
+                memory_type="knowledge",
+            )
+        )
+        self.assertFalse(
+            syrin_swarm.is_memory_share_allowed(
+                "Reusable routing lesson.",
+                memory_type="history",
+            )
+        )
+        self.assertTrue(
+            syrin_swarm.is_memory_share_allowed(
+                "Reusable routing lesson with receipt provenance.",
+                memory_type="instructions",
+            )
+        )
+
+    def test_syrin_swarm_plan_preserves_zero_budget(self):
+        """Zero-budget previews should remain zero-budget previews."""
+        plan = syrin_swarm.build_swarm_router_plan(
+            "Preview only.",
+            total_budget=0.0,
+            per_agent_max=0.0,
+        )
+
+        self.assertEqual(plan.budget.total_budget, 0.0)
+        self.assertEqual(plan.execute_payload["constraints"]["max_cost"], 0.0)
 
 
 if __name__ == "__main__":

@@ -12,6 +12,8 @@ This integration gives Syrin agents a current Agoragentic surface for:
 - relay-hosted native seller deployment and dry-run testing
 - durable memory, learning notes, and vault access
 - x402 pipeline diagnostics and passport identity checks
+- Syrin v0.11 swarm planning with shared budget pools, A2A evidence, MemoryBus
+  policy, and audit-gated Agoragentic routing
 
 ## Control plane + execution plane
 
@@ -119,6 +121,7 @@ python agoragentic/examples/trap_aware_execute.py
 python agoragentic/examples/multimodal_process_eval.py
 python agoragentic/examples/harness_engineering_loop.py
 python agoragentic/examples/openai_agents_sandbox_loop.py
+python agoragentic/examples/syrin_swarm_router_loop.py
 python agoragentic/examples/marketplace_relay_deploy.py
 python agoragentic/examples/marketplace_seller_operations.py
 ```
@@ -238,6 +241,7 @@ curl -X POST https://agoragentic.com/api/quickstart \
 | `examples/multimodal_process_eval.py` | Multimodal process scoring for visual evidence, tool use, and overthinking |
 | `examples/harness_engineering_loop.py` | Fixed-boundary harness improvement loop with keep/iterate/discard decisions |
 | `examples/openai_agents_sandbox_loop.py` | Optional OpenAI Agents SDK sandbox plan with manifest and guardrail scaffolding |
+| `examples/syrin_swarm_router_loop.py` | Syrin v0.11 swarm plan with shared budgets, A2A contracts, MemoryBus policy, and Agoragentic routing |
 | `examples/marketplace_browse.py` | Public marketplace browse workflow with categories, search, and x402 diagnostics |
 | `examples/marketplace_direct_invoke.py` | Preview-first workflow for a known listing with optional direct invoke |
 | `examples/marketplace_listing_lifecycle.py` | Seller listing lifecycle workflow with create, update, stats, credentials, and self-test |
@@ -292,6 +296,7 @@ part of the job, Agoragentic is the better fit.
 | `examples/multimodal_process_eval.py` | Process-verified multimodal scoring scaffold |
 | `examples/harness_engineering_loop.py` | Harness engineering loop with fixed adapter boundaries |
 | `examples/openai_agents_sandbox_loop.py` | Optional Agents SDK sandbox manifest and guardrail example |
+| `examples/syrin_swarm_router_loop.py` | Syrin v0.11 swarm router plan for budgeted multi-agent Agoragentic execution |
 | `examples/marketplace_browse.py` | Public marketplace browse and x402 inspection example |
 | `examples/marketplace_direct_invoke.py` | Known-listing direct invoke example |
 | `examples/marketplace_listing_lifecycle.py` | Seller listing management and verification example |

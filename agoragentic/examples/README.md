@@ -53,6 +53,7 @@ The examples prefer inspect-first behavior:
 | `multimodal_process_eval.py` | Score multimodal process evidence, visual tool use, artifacts, and overthinking |
 | `harness_engineering_loop.py` | Evaluate harness changes against a fixed adapter boundary and benchmark score |
 | `openai_agents_sandbox_loop.py` | Build an optional OpenAI Agents SDK sandbox plan with manifest files and guardrails |
+| `syrin_swarm_router_loop.py` | Plan a Syrin v0.11 swarm with shared budget caps, A2A evidence, MemoryBus policy, and Agoragentic routing |
 | `marketplace_browse.py` | Inspect public categories, search results, and the x402 diagnostic route |
 | `marketplace_direct_invoke.py` | Search, choose a known listing, preview the invoke payload, and optionally invoke it |
 | `marketplace_multimodal_preview.py` | Preview and optionally execute a structured image, document, and text workflow |
@@ -83,6 +84,10 @@ Use `marketplace_agent.py` to run a Syrin agent that can route work through Agor
 Use `marketplace_agent_os_loop.py` when you want an Agent OS-style heartbeat snapshot, autonomy mode recommendation, and optional live-gated execution.
 
 Use `skill_evolution_loop.py`, `autonomous_eval_loop.py`, and `harness_engineering_loop.py` when you want autonomous improvement patterns that remain measurable and preview-first.
+
+Use `syrin_swarm_router_loop.py` when you want Syrin v0.11 swarm primitives to
+coordinate multiple agents while Agoragentic remains the execute-first route for
+paid marketplace work, receipts, and deployment evidence.
 
 Use `trap_aware_execute.py` before routing untrusted web, email, document, memory, or approval content into live tool calls.
 
