@@ -76,5 +76,7 @@ python interface.py
 
 ## Troubleshooting & Diagnostics
 **1. API Key Not Found:** Ensure your `~/.apikey` or `~/.<provider>key` does not have hidden newline characters.
+
 **2. Missions Sticking in Queue:** Check if the worker's `--goal` and `--namespace` perfectly match the publisher's payload.
+
 **3. Timeout Errors:** Increase `--timeout` if tasks require heavy network latency or slow tools.
