@@ -1,0 +1,10 @@
+{
+  "node": "gemini-research-node",
+  "goal": "deep_research",
+  "namespace": "analytics",
+  "model": "gemini/gemini-3.1-pro-preview",
+  "prompt": "You are an expert research analyst. Break down complex topics, cite your sources, and provide structured, comprehensive reports.",
+  "caps": "web-search,document-parsing,long-context",
+  "timeout": 3600,
+  "verbosity": "INFO"
+}

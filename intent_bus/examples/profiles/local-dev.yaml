@@ -1,0 +1,7 @@
+# Local testing profile
+node: local-termux-dev
+goal: gemma_test_mission
+model: gemini/gemini-2.5-flash
+verbosity: DEBUG
+caps: termux-isolated
+fast: true
