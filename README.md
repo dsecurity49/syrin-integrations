@@ -48,6 +48,20 @@ Use [agoragentic/AGENT_TRAP_THREAT_MODEL.md](agoragentic/AGENT_TRAP_THREAT_MODEL
 when adding workflows that touch untrusted content, memory, spend, deployment,
 or approvals.
 
+
+### `intent_bus/`
+
+[Intent Bus](https://github.com/dsecurity49/Intent-Bus) as a zero-trust, distributed execution layer for Syrin agents.
+
+Includes:
+- Atomic routing and at-least-once execution guarantees
+- Persistent KV state recovery for interrupted missions
+- Automatic error translation and dead-letter queueing
+- Dashboard telemetry via Chiasm
+
+Start with [intent_bus/README.md](intent_bus/README.md) and check [intent_bus/examples/README.md](intent_bus/examples/README.md) for multi-worker and profile-driven examples.
+
+
 ## Contributing
 
 Add each integration in its own directory so the code, docs, and examples stay isolated and easy to evolve independently.
