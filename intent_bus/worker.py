@@ -62,13 +62,14 @@ def _run_diagnostics(args, bus_key: str, provider: str, active_key: str, chiasm_
 # ==============================================================================
 
 def main():
+    """Initializes the worker CLI, parses arguments, and starts the Intent Bus Harness."""
     parser = argparse.ArgumentParser(description="Syrin AI Intent Worker Node")
 
     parser.add_argument("--goal", type=str, default="gemma_test_mission", help="The Intent Bus goal to claim")
     parser.add_argument("--namespace", type=str, default="default", help="The namespace queue")
     parser.add_argument("--node", type=str, default="worker-1", help="Unique identifier for this worker instance")
 
-    parser.add_argument("--model", type=str, default="gemini/gemma-4-31b-it", help="The LLM model string (e.g., groq/llama3-8b, gemini/gemini-3.1-pro-preview)")
+    parser.add_argument("--model", type=str, default="gemini/gemma-4-31b-it", help="The LLM model string")
     parser.add_argument("--prompt", type=str, default="You are a helpful AI assistant executing operations.", help="AI system prompt")
     parser.add_argument("--caps", type=str, default="gemma,termux-isolated", help="Comma-separated capabilities")
 
@@ -143,6 +144,9 @@ def main():
     if not active_key:
         print(f"🔴 Fatal: Missing API key for '{provider}'. Check your hidden key files or use --ping.")
         sys.exit(1)
+    if args.dashboard and not chiasm_key:
+        print("🔴 Fatal: Dashboard URL provided, but missing Chiasm Key (~/.chiasmkey).")
+        sys.exit(1)
 
     configure_observability(args.verbosity)
     capabilities_list = [cap.strip() for cap in args.caps.split(",")]
@@ -154,13 +158,12 @@ def main():
 
     # --- Dynamic Agent Factory ---
     def agent_factory():
-        # Syrin requires explicit Model wrappers. We dynamically route based on the provider string.
+        """Dynamically instantiates a Syrin Agent based on the chosen model provider string."""
         if provider in ["gemini", "google"]:
             syrin_model = Model.Google(args.model, api_key=active_key)
         elif provider == "anthropic":
             syrin_model = Model.Anthropic(args.model, api_key=active_key)
         else:
-            # Groq, OpenRouter, and OpenAI all use the OpenAI standard under the hood
             syrin_model = Model.OpenAI(args.model, api_key=active_key)
 
         return Agent(
