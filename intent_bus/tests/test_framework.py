@@ -8,6 +8,9 @@ from intent_bus import ClaimedIntent
 
 class TestSyrinFramework(unittest.TestCase):
 
+    def tearDown(self):
+        self.harness.shutdown()
+
     def setUp(self):
         """Set up dummy objects and mocks before each test."""
         # 1. Mock the Intent Bus Client

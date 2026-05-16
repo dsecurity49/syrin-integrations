@@ -1,59 +1,73 @@
+import sys
 import json
 import logging
+import argparse
 from pathlib import Path
 from intent_bus import IntentClient
 
-# Mute noisy internal logs
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 def load_secret(filename: str) -> str:
     path = Path.home() / filename
-    if path.exists(): 
-        return path.read_text().strip()
-    raise FileNotFoundError(f"Missing secret: {path}")
+    return path.read_text().strip() if path.exists() else ""
+
+def load_profile(profile_path: str) -> dict:
+    p = Path(profile_path)
+    if not p.exists():
+        print(f"🔴 Fatal: Profile not found: {profile_path}")
+        sys.exit(1)
+
+    with open(p, "r") as f:
+        if p.suffix == '.json':
+            data = json.load(f)
+        elif p.suffix in ['.yaml', '.yml']:
+            try:
+                import yaml
+                data = yaml.safe_load(f)
+            except ImportError:
+                print("🟡 Warning: Cannot load YAML. Install pyyaml: pip install pyyaml")
+                sys.exit(1)
+        else:
+            print("🔴 Fatal: Profile must be .json or .yaml")
+            sys.exit(1)
+
+    if not isinstance(data, dict):
+        print("🔴 Fatal: Profile must be a valid JSON/YAML object.")
+        sys.exit(1)
+        
+    return data
 
 def main():
-    print("\n\033[95m=== INTENT BUS COMMAND LINE INTERFACE ===\033[0m")
-    print("Connecting to the broker...")
+    parser = argparse.ArgumentParser(description="Interactive Intent Bus REPL")
+    parser.add_argument("--goal", default="gemma_test_mission")
+    parser.add_argument("--namespace", default="default")
+    parser.add_argument("--profile", help="Optional JSON/YAML profile")
+    args = parser.parse_args()
 
+    if args.profile:
+        profile = load_profile(args.profile)
+        args.goal = profile.get("goal", args.goal)
+        args.namespace = profile.get("namespace", args.namespace)
+
+    print("\n\033[95m=== INTENT BUS COMMAND LINE INTERFACE ===\033[0m")
     try:
         bus_key = load_secret(".apikey")
+        if not bus_key: raise ValueError("Missing ~/.apikey")
         client = IntentClient(api_key=bus_key)
-        print("\033[92m[Connected]\033[0m Ready to dispatch missions to Gemma 4.\n")
+        print(f"\033[92m[Connected]\033[0m Target: {args.namespace}/{args.goal}\n")
     except Exception as e:
         print(f"\033[91m[Connection Error]\033[0m {e}")
-        return
+        sys.exit(1)
 
-    # The Interactive Loop
     while True:
         try:
-            # 1. Get user input
             user_input = input("\n\033[96m[Mission Prompt]>\033[0m ").strip()
+            if not user_input: continue
+            if user_input.lower() in ['exit', 'quit', 'clear']: break
             
-            if not user_input:
-                continue
-            if user_input.lower() in ['exit', 'quit', 'clear']:
-                print("Exiting interface...")
-                break
-
-            # 2. Package the intent
-            payload = {"instruction": user_input}
-            target_goal = "gemma_test_mission"
-
-            print(f"  \033[90m-> Dispatching to '{target_goal}'...\033[0m")
-
-            # 3. Publish to the bus
-            response = client.publish(
-                goal=target_goal,
-                payload=payload,
-                namespace="default" 
-            )
-
+            client.publish(goal=args.goal, payload={"instruction": user_input}, namespace=args.namespace)
             print("  \033[92m-> Mission successfully dropped on the bus!\033[0m")
-            print("  \033[90m-> Check your Worker terminal for execution logs.\033[0m")
-
         except KeyboardInterrupt:
-            print("\nExiting interface...")
             break
         except Exception as e:
             print(f"\n  \033[91m[Dispatch Error]\033[0m {e}")

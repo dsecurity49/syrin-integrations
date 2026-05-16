@@ -45,7 +45,7 @@ You can scale horizontally by running multiple terminal sessions (or containers)
 * **Worker 2:** `python worker.py --node w-2`
 * **Worker 3:** `python worker.py --node w-3`
 
-When you dispatch 3 missions via `trigger.py`, the Intent Bus guarantees **Atomic Claims**. Worker 1 takes Mission A, Worker 2 takes Mission B, and Worker 3 takes Mission C. No two workers will ever process the same mission.
+When you dispatch 3 missions via `trigger.py`, the Intent Bus guarantees **Atomic Claims**. Worker 1 takes Mission A, Worker 2 takes Mission B, and Worker 3 takes Mission C. Workers atomically claim jobs, preventing concurrent double-execution.
 
 ## State Recovery Walkthrough
 Syrin supports resuming long tasks.

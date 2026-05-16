@@ -1,0 +1,7 @@
+{
+  "node": "text-bot-01",
+  "goal": "summarize_text",
+  "namespace": "content",
+  "model": "gemini/gemini-2.5-flash",
+  "prompt": "You are a summarization bot. Return 3 bullet points."
+}

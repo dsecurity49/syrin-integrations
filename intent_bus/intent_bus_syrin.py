@@ -18,7 +18,7 @@ def configure_observability(verbosity: str):
 
     litellm_logger = logging.getLogger("LiteLLM")
     bus_logger = logging.getLogger("intent_bus")
-    
+
     if verbosity == "SILENT":
         litellm_logger.setLevel(logging.CRITICAL)
         bus_logger.setLevel(logging.CRITICAL)
@@ -58,8 +58,8 @@ class ChiasmObserver:
 
         if not task_id:
             res = self._send_request("POST", "/tasks", {
-                "agent": "gemini", 
-                "project": "Intent Bus", 
+                "agent": "gemini",
+                "project": "Intent Bus",
                 "title": f"[{self.node_name}] m:{mission_id[:8]}"
             })
             if res and 'id' in res:
@@ -74,7 +74,7 @@ class ChiasmObserver:
                 msg = json.dumps(raw_msg, indent=2) if isinstance(raw_msg, (dict, list)) else str(raw_msg)
             else:
                 msg = str(data) if data else 'Done.'
-            
+
             self._send_request("PATCH", f"/tasks/{task_id}", {"status": status, "summary": msg})
 
     async def notify(self, mission_id: str, event_type: str, data: dict):
@@ -125,11 +125,11 @@ class SyrinMissionContext:
 
 class IntentBusSyrinHarness:
     def __init__(
-        self, 
-        agent_factory: Callable[[], Any], 
-        bus: IntentClient, 
-        capabilities: List[str] = None, 
-        telemetry_filter: Set[str] = None, 
+        self,
+        agent_factory: Callable[[], Any],
+        bus: IntentClient,
+        capabilities: List[str] = None,
+        telemetry_filter: Set[str] = None,
         observer: Optional[ChiasmObserver] = None,
         mission_timeout: int = 900,
         node_name: str = "worker"
@@ -204,9 +204,10 @@ class IntentBusSyrinHarness:
 
         heartbeat_task = asyncio.create_task(ctx.heartbeat())
         self._active_tasks.add(heartbeat_task)
-        
+
         final_result = None
         fatal_error_msg = ""
+        mission_failed = False
 
         try:
             try:
@@ -217,7 +218,7 @@ class IntentBusSyrinHarness:
                 self._display(ctx.mission_id, "🟡 [State Warning]", str(e), "YELLOW")
 
             async def run_mission():
-                nonlocal final_result, fatal_error_msg
+                nonlocal final_result, fatal_error_msg, mission_failed
                 async for event in agent.arun_events(instruction):
 
                     if event.type == "error":
@@ -225,9 +226,11 @@ class IntentBusSyrinHarness:
                         if not str(raw_err).strip(): raw_err = "Unknown Error"
                         clean_err = self._translate_error(raw_err)
                         fatal_error_msg = clean_err
-                        
+                        mission_failed = True
+
                         if isinstance(event.data, dict): event.data['msg'] = clean_err
                         self._display(ctx.mission_id, "🔴 MISSION FAILED:", clean_err, "RED")
+                        break  # Stop processing events after error
 
                     if event.type in self.telemetry_filter:
                         await ctx.emit_telemetry(event.type, event.data)
@@ -238,7 +241,7 @@ class IntentBusSyrinHarness:
 
                     if event.type == "checkpoint_ready" and hasattr(agent, 'save_checkpoint'):
                         await ctx.persist_state(agent.save_checkpoint())
-                    
+
                     if event.type == "run_end":
                         data = event.data
                         raw_content = data.get("content", data) if isinstance(data, dict) else data
@@ -247,6 +250,8 @@ class IntentBusSyrinHarness:
 
             try:
                 await asyncio.wait_for(run_mission(), timeout=self.mission_timeout)
+                if mission_failed:
+                    raise RuntimeError(f"Mission failed with error: {fatal_error_msg}")
                 if final_result is None: raise RuntimeError("Mission generator exhausted without 'run_end'.")
                 return {'result': final_result, 'result_type': 'text'}
 
@@ -279,8 +284,10 @@ class IntentBusSyrinHarness:
             if hasattr(self.bus, 'close'): self.bus.close()
             self._loop.call_soon(self._loop.stop)
 
-        try: asyncio.run_coroutine_threadsafe(_cleanup(), self._loop).result(timeout=10)
-        except Exception: pass
+        try:
+            asyncio.run_coroutine_threadsafe(_cleanup(), self._loop).result(timeout=10)
+        except Exception as e:
+            logger.warning(f"Shutdown cleanup failed: {e}")
         if self._loop_thread.is_alive(): self._loop_thread.join(timeout=5)
         logger.info(f"[{self.node_name}] Framework terminated.")
 
