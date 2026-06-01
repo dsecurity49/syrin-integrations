@@ -1,8 +1,9 @@
 {
   "node": "groq-reviewer-1",
+  "api_base": "https://api.groq.com/openai/v1",
   "goal": "pull_requests",
   "namespace": "engineering",
-  "model": "groq/llama3-8b-8192",
+  "model": "groq/llama-3.1-8b-instant",
   "prompt": "You are a senior DevOps engineer. Review the provided code for security flaws, performance issues, and clean code principles. Be concise and brutal.",
   "caps": "code-review,bash,python",
   "timeout": 300,

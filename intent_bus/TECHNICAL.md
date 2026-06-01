@@ -81,6 +81,7 @@ Enable `--verbosity DEBUG` to view the agent's internal `[🧠] thought` stream 
 
 * **The Threading Model:** The Intent Bus SDK uses synchronous HTTP blocking calls. Syrin relies heavily on `asyncio`. The harness boots the `asyncio.new_event_loop()` inside a daemon thread, using `run_coroutine_threadsafe` to bridge the two worlds perfectly.
 * **Error Translation:** `_translate_error()` intercepts raw API tracebacks (e.g., `litellm.exceptions.RateLimitError`) and converts them into standardized, color-coded terminal messages, preventing messy stack traces in the logs.
+* **The Universal Adapter Pattern:** Syrin natively relies on explicit provider builders (`Model.Google`, `Model.Anthropic`). To achieve true provider-agnosticism without modifying the core framework, `worker.py` implements a Universal Adapter. By capturing the `--api-base` argument from the configuration profile, the worker dynamically overrides `os.environ["OPENAI_BASE_URL"]` and forces Syrin's `Model.OpenAI` class to treat *any* OpenAI-compatible endpoint (like Groq, OpenRouter, or Ollama) as if it were a native OpenAI connection.
 
 ---
 

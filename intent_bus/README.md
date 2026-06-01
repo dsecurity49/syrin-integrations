@@ -8,6 +8,7 @@ Run Syrin agents as distributed workers. No open ports, atomic routing, built-in
 * Exponential backoff + dead-letter queue
 * Lightweight SQLite backend
 * State persistence between claims
+* **Universal LLM routing (Native support for OpenAI/Anthropic/Gemini + seamless adapter for OpenRouter, Groq, and local Ollama nodes)**
 
 ## When to Use
 **✅ Good Fit:** Background AI agents, web scrapers, long-running research tasks, asynchronous code review bots.
@@ -58,7 +59,7 @@ python trigger.py "Analyze this code"
  Capabilities: ['gemma', 'termux-isolated']
  Verbosity:    INFO
 
-[23d27b36] [worker-1] ⚡ MISSION RECEIVED: Perform a system check. Reply with exactly this...
+[23d27b36] [worker-1] [CLAIMED] MISSION RECEIVED: Perform a system check. Reply with exactly this...
 [23d27b36] [worker-1] 🟢 MISSION COMPLETE.
 STATUS_GREEN_MISSION_1
 ```

@@ -73,6 +73,7 @@ python interface.py
 | `--profile` | Path to JSON/YAML config file | `None` |
 | `--fast` | Override model to `gemini-2.5-flash` | `False` |
 | `--ping` | Run health check and exit | `False` |
+| `--api-base` | Custom OpenAI-compatible API base URL (e.g., OpenRouter, Groq, Ollama) | `None` |
 
 ## Troubleshooting & Diagnostics
 **1. API Key Not Found:** Ensure your `~/.apikey` or `~/.<provider>key` does not have hidden newline characters.
